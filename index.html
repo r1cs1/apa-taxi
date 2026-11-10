@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#111214">
+  <title>Apa TAXI</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='4' y='14' width='56' height='36' rx='8' fill='%23ffcc00'/%3E%3Ctext x='32' y='40' font-family='Arial' font-weight='900' font-size='18' text-anchor='middle' fill='%23111'%3ETAXI%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Inter:wght@400;600;800&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="roof-sign" aria-label="Apa Taxi">
+        <div class="checker"></div>
+        <div class="roof-text">APA <span>TAXI</span></div>
+        <div class="checker"></div>
+      </div>
+      <div class="top-right">
+        <div id="gpsBadge" class="badge badge-muted" title="GPS állapot">GPS: –</div>
+        <div id="statusLamp" class="lamp lamp-free">SZABAD</div>
+        <button id="settingsBtn" class="icon-btn" aria-label="Beállítások">⚙</button>
+      </div>
+    </header>
+
+    <main class="meter">
+      <section class="display">
+        <div class="display-head">
+          <span id="tariffLabel">I. TARIFA · BUDAPEST</span>
+          <span id="modeLabel" class="mode">—</span>
+        </div>
+        <div class="fare-row">
+          <div class="fare-label">FIZETENDŐ</div>
+          <div class="fare"><span id="fare">0</span><span class="cur">Ft</span></div>
+        </div>
+        <div class="stats">
+          <div class="stat"><div class="k">IDŐ</div><div class="v" id="time">00:00:00</div></div>
+          <div class="stat"><div class="k">TÁVOLSÁG</div><div class="v"><span id="dist">0.00</span><small>km</small></div></div>
+          <div class="stat"><div class="k">SEBESSÉG</div><div class="v"><span id="speed">0</span><small>km/h</small></div></div>
+          <div class="stat"><div class="k">VÁRAKOZÁS</div><div class="v" id="wait">00:00</div></div>
+        </div>
+      </section>
+
+      <aside class="side">
+        <div class="breakdown">
+          <div class="row"><span>Alapdíj</span><b id="bBase">0 Ft</b></div>
+          <div class="row"><span>Km-díj <small id="bKmInfo"></small></span><b id="bKm">0 Ft</b></div>
+          <div class="row"><span>Várakozási díj <small id="bWaitInfo"></small></span><b id="bWait">0 Ft</b></div>
+          <div class="row passenger-row"><span>Utas</span><b id="passengerLabel">Családtag</b></div>
+        </div>
+        <div class="controls">
+          <button id="startBtn" class="btn btn-start">INDULÁS</button>
+          <button id="pauseBtn" class="btn btn-pause" disabled>SZÜNET</button>
+          <button id="stopBtn" class="btn btn-stop" disabled>VÉGE · NYUGTA</button>
+        </div>
+        <div class="debt">Családi tartozás összesen: <b id="debtTotal">0 Ft</b> <button id="historyBtn" class="link-btn">részletek</button></div>
+      </aside>
+    </main>
+
+    <div id="toast" class="toast" hidden></div>
+  </div>
+
+  <!-- Receipt -->
+  <div id="receiptModal" class="modal" hidden>
+    <div class="modal-backdrop" data-close></div>
+    <div class="receipt-wrap">
+      <div class="receipt" id="receipt"></div>
+      <div class="modal-actions">
+        <button class="btn btn-small" id="newTripBtn">ÚJ FUVAR</button>
+        <button class="btn btn-small btn-ghost" data-close>BEZÁR</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings -->
+  <div id="settingsModal" class="modal" hidden>
+    <div class="modal-backdrop" data-close></div>
+    <div class="panel">
+      <h2>Beállítások</h2>
+      <label>Utas neve<input id="setPassenger" type="text" placeholder="pl. Anya, Bence, Lili…" maxlength="40"></label>
+      <div class="grid3">
+        <label>Alapdíj (Ft)<input id="setBase" type="number" min="0" step="1"></label>
+        <label>Km-díj (Ft/km)<input id="setKm" type="number" min="0" step="1"></label>
+        <label>Percdíj (Ft/perc)<input id="setMin" type="number" min="0" step="1"></label>
+      </div>
+      <p class="hint" id="thresholdHint"></p>
+      <label class="check"><input id="setDemo" type="checkbox"> Demó mód (szimulált út, GPS nélkül – otthoni kipróbáláshoz)</label>
+      <label class="check"><input id="setSound" type="checkbox"> Hangjelzés indításkor / érkezéskor</label>
+      <div class="modal-actions">
+        <button class="btn btn-small btn-ghost" id="resetRatesBtn">Budapesti hatósági díjak</button>
+        <button class="btn btn-small" id="saveSettingsBtn">MENTÉS</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- History -->
+  <div id="historyModal" class="modal" hidden>
+    <div class="modal-backdrop" data-close></div>
+    <div class="panel">
+      <h2>Fuvarnapló</h2>
+      <div id="historyList" class="history"></div>
+      <div class="modal-actions">
+        <button class="btn btn-small btn-ghost" id="clearHistoryBtn">Tartozás elengedése 🙏</button>
+        <button class="btn btn-small" data-close>BEZÁR</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
