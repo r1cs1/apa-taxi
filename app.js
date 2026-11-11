@@ -37,7 +37,10 @@
   }
 
   // ---------- state ----------
-  let settings = { ...OFFICIAL, passenger: "", demo: false, sound: true, ...load(LS_SETTINGS, {}) };
+  let settings = { ...OFFICIAL, passengers: [], passenger: "", demo: false, sound: true, ...load(LS_SETTINGS, {}) };
+  // older versions stored a single passenger name
+  if (!Array.isArray(settings.passengers)) settings.passengers = [];
+  if (settings.passenger && !settings.passengers.includes(settings.passenger)) settings.passengers.unshift(settings.passenger);
   const freshTrip = () => ({
     status: "idle",      // idle | running | paused | done
     startedAt: null, endedAt: null,
@@ -203,7 +206,6 @@
     $("bWait").textContent = ft(p.wait);
     $("bKmInfo").textContent = `${(trip.billedDistanceM / 1000).toFixed(2)} km × ${nf.format(settings.kmFee)} Ft`;
     $("bWaitInfo").textContent = `${(trip.waitMs / 60000).toFixed(1)} perc × ${nf.format(settings.minFee)} Ft`;
-    $("passengerLabel").textContent = settings.passenger || "Családtag";
 
     const mode = $("modeLabel");
     if (trip.status === "running") {
@@ -354,7 +356,7 @@
 
   // ---------- settings ----------
   function openSettings() {
-    $("setPassenger").value = settings.passenger;
+    $("setPassengers").value = settings.passengers.join("\n");
     $("setBase").value = settings.baseFee;
     $("setKm").value = settings.kmFee;
     $("setMin").value = settings.minFee;
@@ -374,9 +376,11 @@
   function saveSettings() {
     const num = (id, fb) => { const v = parseFloat($(id).value); return Number.isFinite(v) && v >= 0 ? v : fb; };
     const demoChanged = $("setDemo").checked !== settings.demo;
+    const passengers = [...new Set($("setPassengers").value.split(/[\n,]/).map((s) => s.trim().slice(0, 30)).filter(Boolean))].slice(0, 12);
     settings = {
       ...settings,
-      passenger: $("setPassenger").value.trim(),
+      passengers,
+      passenger: passengers.includes(settings.passenger) ? settings.passenger : "",
       baseFee: num("setBase", settings.baseFee),
       kmFee: num("setKm", settings.kmFee),
       minFee: num("setMin", settings.minFee),
@@ -386,8 +390,36 @@
     save(LS_SETTINGS, settings);
     if (demoChanged) startGps();
     closeModals();
+    renderPassengers();
     render();
     toast("Beállítások mentve");
+  }
+
+  // ---------- passengers ----------
+  function renderPassengers() {
+    const box = $("passengerChips");
+    box.innerHTML = "";
+    const chip = (label, cls, onClick) => {
+      const b = document.createElement("button");
+      b.className = `chip ${cls}`;
+      b.textContent = label;
+      b.addEventListener("click", onClick);
+      box.appendChild(b);
+    };
+    if (!settings.passengers.length) {
+      const s = document.createElement("b");
+      s.className = "chip-static";
+      s.textContent = "Családtag";
+      box.appendChild(s);
+      chip("+ utasok", "chip-add", openSettings);
+      return;
+    }
+    settings.passengers.forEach((name) =>
+      chip(name, name === settings.passenger ? "active" : "", () => {
+        settings.passenger = settings.passenger === name ? "" : name; // tap again to deselect
+        save(LS_SETTINGS, settings);
+        renderPassengers();
+      }));
   }
 
   // ---------- UI plumbing ----------
@@ -454,6 +486,7 @@
   // A page reload mid-trip resumes the meter; the gap counts as waiting time.
   if (trip.status === "running") requestWakeLock();
   startGps();
+  renderPassengers();
   render();
   setInterval(tick, 250);
 })();

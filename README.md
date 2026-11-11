@@ -20,7 +20,8 @@ Like a real Hungarian taximeter, it charges **per km above the changeover speed*
 - Taxi lamp that switches between SZABAD, FOGLALT and SZÜNET
 - Pause and resume, plus a receipt with silly payment options ("1 db ölelés", "Mosogatás (1 hét)"…)
 - Trip log with the total the family owes, kept in the browser's localStorage
-- Passenger name, custom rates and an optional beep
+- A list of passenger names (⚙ Settings, one per line); tap a name on the main screen to pick who is riding
+- Custom rates and an optional beep
 - **Demo mode** for trying it at home without driving: ⚙ → Demó mód, or open `?demo=1`
 - Keeps the screen awake while the meter runs, and resumes after a page reload
 

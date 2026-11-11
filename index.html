@@ -29,7 +29,7 @@
     <main class="meter">
       <section class="display">
         <div class="display-head">
-          <span id="tariffLabel">I. TARIFA · BUDAPEST</span>
+          <span id="tariffLabel">I. TARIFA</span>
           <span id="modeLabel" class="mode">—</span>
         </div>
         <div class="fare-row">
@@ -49,7 +49,7 @@
           <div class="row"><span>Alapdíj</span><b id="bBase">0 Ft</b></div>
           <div class="row"><span>Km-díj <small id="bKmInfo"></small></span><b id="bKm">0 Ft</b></div>
           <div class="row"><span>Várakozási díj <small id="bWaitInfo"></small></span><b id="bWait">0 Ft</b></div>
-          <div class="row passenger-row"><span>Utas</span><b id="passengerLabel">Családtag</b></div>
+          <div class="row passenger-row"><span>Utas</span><div class="chips" id="passengerChips"></div></div>
         </div>
         <div class="controls">
           <button id="startBtn" class="btn btn-start">INDULÁS</button>
@@ -80,7 +80,7 @@
     <div class="modal-backdrop" data-close></div>
     <div class="panel">
       <h2>Beállítások</h2>
-      <label>Utas neve<input id="setPassenger" type="text" placeholder="pl. Anya, Bence, Lili…" maxlength="40"></label>
+      <label>Utasok (soronként egy név)<textarea id="setPassengers" rows="4" placeholder="Anya&#10;Bence&#10;Lili"></textarea></label>
       <div class="grid3">
         <label>Alapdíj (Ft)<input id="setBase" type="number" min="0" step="1"></label>
         <label>Km-díj (Ft/km)<input id="setKm" type="number" min="0" step="1"></label>

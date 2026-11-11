@@ -162,7 +162,17 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .breakdown .row:last-child { border-bottom: 0; }
 .breakdown small { color: var(--muted); font-size: 0.72em; display: block; }
 .breakdown b { font-variant-numeric: tabular-nums; white-space: nowrap; }
-.passenger-row b { color: var(--yellow); }
+.passenger-row { align-items: center !important; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+.chip {
+  min-height: 44px; padding: 0 16px; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--panel-2); color: var(--text);
+  font-weight: 600; font-size: clamp(15px, 1.2vw, 18px);
+}
+.chip:active { transform: scale(0.96); }
+.chip.active { background: var(--yellow); border-color: var(--yellow); color: #111; }
+.chip-add { border-style: dashed; color: var(--muted); }
+.chip-static { color: var(--yellow); font-weight: 700; }
 
 .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .btn {
@@ -199,11 +209,12 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .panel { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px 24px; }
 .panel h2 { margin: 0 0 16px; font-family: "Orbitron", sans-serif; letter-spacing: 0.06em; }
 .panel label { display: block; font-size: 15px; color: var(--muted); margin-bottom: 14px; }
-.panel input[type="text"], .panel input[type="number"] {
+.panel input[type="text"], .panel input[type="number"], .panel textarea {
   display: block; width: 100%; margin-top: 6px; padding: 14px; font-size: 20px;
   background: #0f1012; color: var(--text); border: 1px solid var(--line); border-radius: 12px;
   user-select: text;
 }
+.panel textarea { font: inherit; font-size: 18px; resize: vertical; min-height: 110px; }
 .panel .check { display: flex; gap: 12px; align-items: center; color: var(--text); font-size: 17px; }
 .panel .check input { width: 26px; height: 26px; accent-color: var(--yellow); }
 .grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
